@@ -150,10 +150,10 @@ if args.hw:
 elif args.reset:
 	resetImagesAndFolders()
 elif args.cleanup:
-	cleanupFolder
+	cleanupFolder()
 elif args.celebrities:
-	rekognizeCelebrities
+	rekognizeCelebrities()
 elif args.label:
-	beginLabelRekognize
+	beginLabelRekognize()
 else:
 	helloWorld()
