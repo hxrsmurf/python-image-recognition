@@ -51,6 +51,7 @@ def createThumbnails():
 				resizePhoto.close()			
 				shutil.move(fullPath,completePath)
 			else:
+				resizePhoto.close()		
 				shutil.move(fullPath,otherPath)
 				
 # AWS Image Rekognition by creating folders based on the celebrity's face and moving the image there
@@ -81,6 +82,7 @@ def rekognizeCelebrities():
 								# need to move the file to another folder.
 								pass
 							print('Moving ' + fullPath + ' to ' + celebrityPath)
+							image.close()
 							shutil.move(fullPath,celebrityPath)
 							
 # AWS Image Rekognition by creating folders based on the label and moving the image there. This is the main function. 
@@ -99,8 +101,10 @@ def rekognizeLabels():
 					print(labelFolder)
 				fullPath = (completeFolder + fileName)
 				labelPath = (labelFolder + '\\' + fileName)
-				shutil.move(fullPath,labelPath)
 				print('Moving ' + fullPath + ' to ' + labelPath)
+				image.close()
+				shutil.move(fullPath,labelPath)
+				
 
 # The main function to prep the directories for AWS Image Rekognition with Labels
 def beginLabelRekognize():
