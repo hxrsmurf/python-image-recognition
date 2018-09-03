@@ -47,11 +47,10 @@ def createThumbnails():
 					resizePhoto.save(thumbnailFolder + fileName, "PNG")
 				else:
 					shutil.move(fullPath,otherPath)
-				# Sometimes the thumbnail wouldn't create without this.	
 				resizePhoto.close()			
 				shutil.move(fullPath,completePath)
 			else:
-				resizePhoto.close()		
+				resizePhoto.close()	
 				shutil.move(fullPath,otherPath)
 				
 # AWS Image Rekognition by creating folders based on the celebrity's face and moving the image there
@@ -66,7 +65,10 @@ def rekognizeCelebrities():
 				with open(fullPath, 'rb') as image:
 					response = client.recognize_celebrities(Image={'Bytes': image.read()})
 					if not response['CelebrityFaces']:
-						pass
+						celebrityPath = (celebrityFolder + '\\unsorted\\' + fileName)
+						print('Moving ' + fullPath + ' to ' + celebrityPath)
+						image.close()
+						shutil.move(fullPath,celebrityPath)							
 					else:					
 						for celebrity in response['CelebrityFaces']:
 							celebrity = celebrity['Name']
@@ -75,7 +77,6 @@ def rekognizeCelebrities():
 							if not os.path.exists(labelFolder):
 								os.makedirs(labelFolder)
 								print(labelFolder)
-						
 							if celebrity:
 								print('found ' + celebrity)
 							else:
@@ -101,10 +102,9 @@ def rekognizeLabels():
 					print(labelFolder)
 				fullPath = (completeFolder + fileName)
 				labelPath = (labelFolder + '\\' + fileName)
+				image.close()	
 				print('Moving ' + fullPath + ' to ' + labelPath)
-				image.close()
-				shutil.move(fullPath,labelPath)
-				
+				shutil.move(fullPath,labelPath)				
 
 # The main function to prep the directories for AWS Image Rekognition with Labels
 def beginLabelRekognize():
@@ -124,15 +124,15 @@ def nullDirectories():
 	celebrityFolder  = ''
 
 # Directory configuration. Note: use two \\ on Windows. For example, "C:\\Windows\\"
-celebrityFolder  = ''
 client=boto3.client('rekognition')
-completeFolder  = ''
 createFolders  = ''
 directory  = ''
-otherFolder  = ''
-resetDestination  = ''
-resetSource  = ''
 thumbnailFolder  = ''
+completeFolder  = ''
+otherFolder  = ''
+resetSource  = ''
+resetDestination  = ''
+celebrityFolder  = ''
 	
 def helloWorld():
 	print('Hello World')
