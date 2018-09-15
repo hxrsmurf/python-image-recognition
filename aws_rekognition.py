@@ -23,16 +23,16 @@ def resetImagesAndFolders():
 
 # Create the staging folders, not used for celebrity
 def createFolders():
-	for folders in createFolders:
-		newFolder = directory + folders
+	for folders in theFolders:
+		newFolder = labelFolder + folders
 		if not os.path.exists(newFolder):
 			os.makedirs(newFolder)
 			print('Creating staging folder: ' + newFolder)
 
 # This function is used to downscale the image. There isa 5 MB file size limit.
 def createThumbnails():
-	for fileName in os.listdir(directory):
-		fullPath = (directory + fileName)
+	for fileName in os.listdir(labelFolder):
+		fullPath = (labelFolder + fileName)
 		completePath = (completeFolder + fileName)
 		otherPath = (otherFolder + fileName)
 		if os.path.isfile(fullPath):
@@ -78,7 +78,7 @@ def rekognizeCelebrities():
 								os.makedirs(labelFolder)
 								print(labelFolder)
 							if celebrity:
-								print('found ' + celebrity)
+								print('Detected ' + celebrity)
 							else:
 								# need to move the file to another folder.
 								pass
@@ -114,40 +114,43 @@ def beginLabelRekognize():
 
 # Redundant so I can easily put my folders in. 
 def nullDirectories():
-	createFolders  = ''
-	directory  = ''
-	thumbnailFolder  = ''
-	completeFolder  = ''
-	otherFolder  = ''
-	resetSource  = ''
-	resetDestination  = ''
-	celebrityFolder  = ''
+	client = boto3.client('rekognition')
+	celebrityFolder = ''
+	labelFolder = ''
+	completeFolder = labelFolder + 'completeFolder\\'
+	theFolders = {"completeFolder", "otherFolder", "thumbnailFolder"}
+	otherFolder = labelFolder + 'otherFolder\\'
+	resetDestination = completeFolder
+	resetSource = ''
+	thumbnailFolder = labelFolder + 'thumbnailFolder\\'
 
 # Directory configuration. Note: use two \\ on Windows. For example, "C:\\Windows\\"
-client=boto3.client('rekognition')
-createFolders  = ''
-directory  = ''
-thumbnailFolder  = ''
-completeFolder  = ''
-otherFolder  = ''
-resetSource  = ''
-resetDestination  = ''
-celebrityFolder  = ''
+client = boto3.client('rekognition')
+celebrityFolder = ''
+labelFolder = ''
+completeFolder = labelFolder + 'completeFolder\\'
+theFolders = {"completeFolder", "otherFolder", "thumbnailFolder"}
+otherFolder = labelFolder + 'otherFolder\\'
+resetDestination = completeFolder
+resetSource = ''
+thumbnailFolder = labelFolder + 'thumbnailFolder\\'
 	
 def helloWorld():
 	print('Hello World')
 
 parser = argparse.ArgumentParser(description='Small Python script to use Amazon Web Services\' Rekognition to sort images by celebrity or by the first label it finds.')
-parser.add_argument('-hw', action='store_true', help='Hello World')
-parser.add_argument('-reset', action='store_true', help='Unorganize images - grab all images and put them in root directory')
+parser.add_argument('-hw', '-helloWorld', action='store_true', help='Hello World')
+parser.add_argument('-resetSource', '-rs', action='store_true', help='Unorganize images - grab all images and put them in root directory')
 parser.add_argument('-cleanup', action='store_true', help='Remove Thumbnail Folder')
 parser.add_argument('-celebrities', action='store_true', help='Rekognize Celebrities')
-parser.add_argument('-label', action='store_true', help='Rekognize Pictures by Label')
+parser.add_argument('-label', '-lbl', action='store_true', help='Rekognize Pictures by Label')
+parser.add_argument('-createFolders','-cF', action='store_true', help='Create Folders')
+
 args = parser.parse_args()
 
 if args.hw:
 	helloWorld()
-elif args.reset:
+elif args.resetSource:
 	resetImagesAndFolders()
 elif args.cleanup:
 	cleanupFolder()
@@ -155,5 +158,7 @@ elif args.celebrities:
 	rekognizeCelebrities()
 elif args.label:
 	beginLabelRekognize()
+elif args.cF:
+	createFolders()
 else:
 	helloWorld()
