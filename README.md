@@ -4,7 +4,7 @@ This uses [AWS Rekognition](https://docs.aws.amazon.com/rekognition/latest/dg/im
 
 I did manage to find the Google Vision Python I copied from Google's documentation. [google_vision.py](https://github.com/hxrsmurf/python-image-recognition/blob/master/google_vision.py). I hope to implement this into the existing python script as a new function. And then maybe compare both results to double-check them. 
 
-The `nullDirectories()` section is for me to quickly update the section right below it with my own directories. Remember to do that when you run the Python script.
+The `nullDirectories()` function is not really a function. It's a placeholder so I can quickly update the actual variables right below. Remember to do that when you run the Python script.
 
 Links:
 * [Stackoverflow - Move Files](https://stackoverflow.com/questions/2909975/python-list-directory-subdirectory-and-files)
