@@ -13,7 +13,7 @@ Python Requirements:
 
 Bugs:
 
-# Cannot sort multiple recognitions
+* Cannot sort multiple recognitions
 
 Links:
 * [Stackoverflow - Move Files](https://stackoverflow.com/questions/2909975/python-list-directory-subdirectory-and-files)
