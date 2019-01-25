@@ -6,6 +6,15 @@ I did manage to find the Google Vision Python I copied from Google's documentati
 
 The `nullDirectories()` function is not really a function. It's a placeholder so I can quickly update the actual variables right below. Remember to do that when you run the Python script.
 
+Python Requirements:
+
+* pillow
+* boto3
+
+Bugs:
+
+# Cannot sort multiple recognitions
+
 Links:
 * [Stackoverflow - Move Files](https://stackoverflow.com/questions/2909975/python-list-directory-subdirectory-and-files)
 * [AWS Rekognition](https://docs.aws.amazon.com/rekognition/latest/dg/images-bytes.html)

@@ -6,6 +6,7 @@ import argparse
 import boto3
 import json
 import os
+import pprint
 import shutil
 from PIL import Image
 
@@ -71,6 +72,7 @@ def rekognizeCelebrities():
 						shutil.move(fullPath,celebrityPath)							
 					else:					
 						for celebrity in response['CelebrityFaces']:
+							# pprint.pprint(celebrity) 
 							celebrity = celebrity['Name']
 							labelFolder = celebrityFolder + celebrity
 							celebrityPath = labelFolder + '\\' + fileName
@@ -85,6 +87,7 @@ def rekognizeCelebrities():
 							print('Moving ' + fullPath + ' to ' + celebrityPath)
 							image.close()
 							shutil.move(fullPath,celebrityPath)
+							break
 							
 # AWS Image Rekognition by creating folders based on the label and moving the image there. This is the main function. 
 def rekognizeLabels():
@@ -118,7 +121,7 @@ def nullDirectories():
 	celebrityFolder = ''
 	labelFolder = ''
 	completeFolder = labelFolder + 'completeFolder\\'
-	theFolders = {"completeFolder", "otherFolder", "thumbnailFolder"}
+	theFolders = {"completeFolder", "otherFolder", "thumbnailFolder", "unsorted"}
 	otherFolder = labelFolder + 'otherFolder\\'
 	resetDestination = completeFolder
 	resetSource = ''
@@ -129,7 +132,7 @@ client = boto3.client('rekognition')
 celebrityFolder = ''
 labelFolder = ''
 completeFolder = labelFolder + 'completeFolder\\'
-theFolders = {"completeFolder", "otherFolder", "thumbnailFolder"}
+theFolders = {"completeFolder", "otherFolder", "thumbnailFolder", "unsorted"}
 otherFolder = labelFolder + 'otherFolder\\'
 resetDestination = completeFolder
 resetSource = ''
@@ -140,11 +143,11 @@ def helloWorld():
 
 parser = argparse.ArgumentParser(description='Small Python script to use Amazon Web Services\' Rekognition to sort images by celebrity or by the first label it finds.')
 parser.add_argument('-hw', '-helloWorld', action='store_true', help='Hello World')
-parser.add_argument('-resetSource', '-rs', action='store_true', help='Unorganize images - grab all images and put them in root directory')
-parser.add_argument('-cleanup', action='store_true', help='Remove Thumbnail Folder')
-parser.add_argument('-celebrities', action='store_true', help='Rekognize Celebrities')
+parser.add_argument('-resetSource', '-rs', action='store_true', help='Undo the rekognition; move everything back to the root folder')
+parser.add_argument('-cleanup', '-clean', action='store_true', help='Remove Thumbnail Folder')
+parser.add_argument('-celebrities', '-c', action='store_true', help='Rekognize Celebrities')
 parser.add_argument('-label', '-lbl', action='store_true', help='Rekognize Pictures by Label')
-parser.add_argument('-createFolders','-cF', action='store_true', help='Create Folders')
+parser.add_argument('-createFolders','-cf', '-cF', action='store_true', help='Create Folders')
 
 args = parser.parse_args()
 
@@ -158,7 +161,7 @@ elif args.celebrities:
 	rekognizeCelebrities()
 elif args.label:
 	beginLabelRekognize()
-elif args.cF:
+elif args.createFolders:
 	createFolders()
 else:
 	helloWorld()
