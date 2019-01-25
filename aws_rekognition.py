@@ -9,6 +9,8 @@ import os
 import pprint
 import shutil
 from PIL import Image
+import praw
+import wget
 
 # Delete the thumbnail/scaled folder after done rekognizing. Manually implemented right now. 
 def cleanupFolder():
@@ -28,7 +30,7 @@ def createFolders():
 		newFolder = labelFolder + folders
 		if not os.path.exists(newFolder):
 			os.makedirs(newFolder)
-			print('Creating staging folder: ' + newFolder)
+			print('Creating folder ' + newFolder)
 
 # This function is used to downscale the image. There isa 5 MB file size limit.
 def createThumbnails():
@@ -114,6 +116,23 @@ def beginLabelRekognize():
 	createFolders()
 	createThumbnails()
 	rekognizeLabels()
+	
+# Reddit Downloader
+# Source: http://www.storybench.org/how-to-scrape-reddit-with-python/
+
+def reddit():
+	reddit = praw.Reddit(client_id='', \
+						 client_secret='', \
+						 user_agent='-python', \
+						 username='', \
+						 password='')
+
+	subreddit = reddit.subreddit('')
+
+	#  Can be one of: all, day, hour, month, week, year
+	for submission in subreddit.top('month'):
+		file = submission.url
+		wget.download(file)
 
 # Redundant so I can easily put my folders in. 
 def nullDirectories():
@@ -148,8 +167,7 @@ parser.add_argument('-cleanup', '-clean', action='store_true', help='Remove Thum
 parser.add_argument('-celebrities', '-c', action='store_true', help='Rekognize Celebrities')
 parser.add_argument('-label', '-lbl', action='store_true', help='Rekognize Pictures by Label')
 parser.add_argument('-createFolders','-cf', '-cF', action='store_true', help='Create Folders')
-
-args = parser.parse_args()
+parser.add_argument('-reddit','-r', action='store_true', help='Reddit Function')
 
 if args.hw:
 	helloWorld()
@@ -163,5 +181,7 @@ elif args.label:
 	beginLabelRekognize()
 elif args.createFolders:
 	createFolders()
+elif args.reddit:
+	reddit()
 else:
 	helloWorld()
