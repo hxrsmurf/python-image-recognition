@@ -59,43 +59,46 @@ def createThumbnails():
 # AWS Image Rekognition by creating folders based on the celebrity's face and moving the image there
 def rekognizeCelebrities():
 	for fileName in os.listdir(celebrityFolder):
-		fullPath = (celebrityFolder + fileName)
-		# I wasn't sure how to do this better, but this works.
-		if fileName == "Thumbs.db":
+		if not os.path.isfile(fileName):
 			pass
-		else:			
-			if os.path.isfile(fullPath):
-				with open(fullPath, 'rb') as image:
-					response = client.recognize_celebrities(Image={'Bytes': image.read()})
-					if not response['CelebrityFaces']:
-						celebrityPath = (celebrityFolder + '\\unsorted\\' + fileName)
-						print('Moving ' + fullPath + ' to ' + celebrityPath)
-						image.close()
-						shutil.move(fullPath,celebrityPath)							
-					else:					
-						for celebrity in response['CelebrityFaces']:
-							# pprint.pprint(celebrity) 
-							celebrity = celebrity['Name']
-							labelFolder = celebrityFolder + celebrity
-							celebrityPath = labelFolder + '\\' + fileName
-							if not os.path.exists(labelFolder):
-								os.makedirs(labelFolder)
-								print(labelFolder)
-							if celebrity:
-								print('Detected ' + celebrity)
-							else:
-								# need to move the file to another folder.
-								pass
-							print('Moving ' + fullPath + ' to ' + celebrityPath)
-							image.close()
-							shutil.move(fullPath,celebrityPath)
-							break
+		else:		
+			fullPath = (celebrityFolder + fileName)
+			# I wasn't sure how to exclude Thumbs.db, but this works.
+			if fileName == "Thumbs.db":
+				pass
+			else:			
+				if os.path.isfile(fullPath):
+					fileSize = os.path.getsize(fullPath)
+					# Image must be 5MB in size, https://docs.aws.amazon.com/rekognition/latest/dg/limits.html
+					if fileSize >= 5242880:
+						pass
+					else:						
+						with open(fullPath, 'rb') as image:
+							response = client.recognize_celebrities(Image={'Bytes': image.read()})													
+							if not response['CelebrityFaces']:
+								celebrityPath = (celebrityFolder + '\\unsorted\\' + fileName)
+								image.close()
+								shutil.move(fullPath,celebrityPath)							
+							else:					
+								for celebrity in response['CelebrityFaces']:
+									celebrity = celebrity['Name']
+									labelFolder = celebrityFolder + celebrity
+									celebrityPath = labelFolder + '\\' + fileName
+									if not os.path.exists(labelFolder):
+										os.makedirs(labelFolder)
+									if celebrity:
+										print('Detected ' + celebrity)
+									else:
+										# I don't remember what this does, but need to move the file to another folder.
+										pass
+									image.close()
+									shutil.move(fullPath,celebrityPath)
+									break
 							
 # AWS Image Rekognition by creating folders based on the label and moving the image there. This is the main function. 
 def rekognizeLabels():
 	for fileName in os.listdir(thumbnailFolder):
-		fullPath = (thumbnailFolder + fileName)
-		
+		fullPath = (thumbnailFolder + fileName)		
 		with open(fullPath, 'rb') as image:
 			#  I'd like to implement a selector so I can easily select what it should be. 
 			response = client.detect_labels(Image={'Bytes': image.read()},MaxLabels=1)
@@ -119,20 +122,23 @@ def beginLabelRekognize():
 	
 # Reddit Downloader
 # Source: http://www.storybench.org/how-to-scrape-reddit-with-python/
-
 def reddit():
 	reddit = praw.Reddit(client_id='', \
 						 client_secret='', \
-						 user_agent='-python', \
+						 user_agent='', \
 						 username='', \
 						 password='')
-
 	subreddit = reddit.subreddit('')
-
 	#  Can be one of: all, day, hour, month, week, year
-	for submission in subreddit.top('month'):
 		file = submission.url
 		wget.download(file)
+
+# File counter
+def fileCounter():
+	for root, dirs, files in os.walk(celebrityFolder):		
+		pictureCount = len(os.listdir(root)) 
+		#utf-8 allows for "Out-File" in PowerShell
+		print ((root + ',' + format(pictureCount)).encode('utf-8'))
 
 # Redundant so I can easily put my folders in. 
 def nullDirectories():
@@ -168,6 +174,9 @@ parser.add_argument('-celebrities', '-c', action='store_true', help='Rekognize C
 parser.add_argument('-label', '-lbl', action='store_true', help='Rekognize Pictures by Label')
 parser.add_argument('-createFolders','-cf', '-cF', action='store_true', help='Create Folders')
 parser.add_argument('-reddit','-r', action='store_true', help='Reddit Function')
+parser.add_argument('-fileCounter','-fC', '-fc', action='store_true', help='File Counter')
+
+args = parser.parse_args()
 
 if args.hw:
 	helloWorld()
@@ -183,5 +192,7 @@ elif args.createFolders:
 	createFolders()
 elif args.reddit:
 	reddit()
+elif args.fileCounter:
+	fileCounter()
 else:
 	helloWorld()
