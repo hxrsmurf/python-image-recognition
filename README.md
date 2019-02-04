@@ -13,7 +13,20 @@ Python Requirements:
 
 Bugs:
 
-* Cannot sort multiple recognitions
+* Cannot Sort:
+  * Multiple recognitions
+  * GIF/GIFV
+* Cannot parse names like:
+  * John Doe "John" Doe'
+
+To Do:
+
+* Correct error handling
+* Multiple subreddits
+* Extract face from GIF/GIFV, then sort
+* Implement a label selector
+* Possibly separate function for folders, gifs, and other unsupported types
+* Pair with Google Vision
 
 Links:
 * [Stackoverflow - Move Files](https://stackoverflow.com/questions/2909975/python-list-directory-subdirectory-and-files)
