@@ -17,12 +17,12 @@ Bugs:
   * Multiple recognitions
   * GIF/GIFV
 * Cannot parse names like:
-  * John Doe "John" Doe'
+  * John Doe "John" Doe
 
 To Do:
 
 * Correct error handling
-* Multiple subreddits
+* Multiple subreddits (done)
 * Extract face from GIF/GIFV, then sort
 * Implement a label selector
 * Possibly separate function for folders, gifs, and other unsupported types
