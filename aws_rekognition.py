@@ -28,6 +28,7 @@ def resetImagesAndFolders():
 def createFolders():
 	for folders in theFolders:
 		newFolder = labelFolder + folders
+		newFolder = celebrityFolder + labelFolder + folders
 		if not os.path.exists(newFolder):
 			os.makedirs(newFolder)
 			print('Creating folder ' + newFolder)
@@ -58,9 +59,9 @@ def createThumbnails():
 				
 # AWS Image Rekognition by creating folders based on the celebrity's face and moving the image there
 def rekognizeCelebrities():
-	for fileName in os.listdir(celebrityFolder):
-		if not os.path.isfile(fileName):
-			pass
+	for fileName in os.listdir(celebrityFolder):		
+		if os.path.isfile(fileName):
+			pass			
 		else:		
 			fullPath = (celebrityFolder + fileName)
 			# I wasn't sure how to exclude Thumbs.db, but this works.
@@ -74,7 +75,7 @@ def rekognizeCelebrities():
 						pass
 					else:						
 						with open(fullPath, 'rb') as image:
-							response = client.recognize_celebrities(Image={'Bytes': image.read()})													
+							response = client.recognize_celebrities(Image={'Bytes': image.read()})										
 							if not response['CelebrityFaces']:
 								celebrityPath = (celebrityFolder + '\\unsorted\\' + fileName)
 								image.close()
@@ -85,9 +86,10 @@ def rekognizeCelebrities():
 									labelFolder = celebrityFolder + celebrity
 									celebrityPath = labelFolder + '\\' + fileName
 									if not os.path.exists(labelFolder):
+										#print(fullPath)
 										os.makedirs(labelFolder)
 									if celebrity:
-										print('Detected ' + celebrity)
+										print('Detected ' + celebrity)										
 									else:
 										# I don't remember what this does, but need to move the file to another folder.
 										pass
@@ -128,10 +130,19 @@ def reddit():
 						 user_agent='', \
 						 username='', \
 						 password='')
-	subreddit = reddit.subreddit('')
-	#  Can be one of: all, day, hour, month, week, year
-		file = submission.url
-		wget.download(file)
+	subreddits = [ "" ]	
+	for each in subreddits:
+		print(each)
+		subreddit = reddit.subreddit(each)
+		#  Can be one of: all, day, hour, month, week, year
+		for submission in subreddit.top('week'):
+			file = submission.url
+			extension = os.path.splitext(file)[-1].lower()
+			if extension == '.jpg' or extension == '.jpeg' or extension == '.png':
+				print(file)
+				wget.download(file, celebrityFolder)
+			else:
+				pass
 
 # File counter
 def fileCounter():

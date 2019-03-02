@@ -16,6 +16,7 @@ Bugs:
 * Cannot Sort:
   * Multiple recognitions
   * GIF/GIFV
+  * No file extensions
 * Cannot parse names like:
   * John Doe "John" Doe
 
