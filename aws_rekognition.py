@@ -27,7 +27,6 @@ def resetImagesAndFolders():
 # Create the staging folders, not used for celebrity
 def createFolders():
 	for folders in theFolders:
-		newFolder = labelFolder + folders
 		newFolder = celebrityFolder + labelFolder + folders
 		if not os.path.exists(newFolder):
 			os.makedirs(newFolder)
@@ -65,7 +64,7 @@ def rekognizeCelebrities():
 		else:		
 			fullPath = (celebrityFolder + fileName)
 			# I wasn't sure how to exclude Thumbs.db, but this works.
-			if fileName == "Thumbs.db":
+			if fileName == "Thumbs.db" or fileName == "desktop.ini":
 				pass
 			else:			
 				if os.path.isfile(fullPath):
@@ -75,7 +74,7 @@ def rekognizeCelebrities():
 						pass
 					else:						
 						with open(fullPath, 'rb') as image:
-							response = client.recognize_celebrities(Image={'Bytes': image.read()})										
+							response = client.recognize_celebrities(Image={'Bytes': image.read()})								
 							if not response['CelebrityFaces']:
 								celebrityPath = (celebrityFolder + '\\unsorted\\' + fileName)
 								image.close()
@@ -84,19 +83,23 @@ def rekognizeCelebrities():
 								for celebrity in response['CelebrityFaces']:
 									celebrity = celebrity['Name']
 									labelFolder = celebrityFolder + celebrity
-									celebrityPath = labelFolder + '\\' + fileName
-									if not os.path.exists(labelFolder):
-										#print(fullPath)
-										os.makedirs(labelFolder)
+									celebrityPath = labelFolder + '\\' + fileName									
 									if celebrity:
-										print('Detected ' + celebrity)										
-									else:
-										# I don't remember what this does, but need to move the file to another folder.
-										pass
-									image.close()
-									shutil.move(fullPath,celebrityPath)
-									break
-							
+										image.close()
+										if os.path.exists(labelFolder):		
+											try: 
+												print ('Moving: ' + fullPath)
+												shutil.move(fullPath,celebrityPath)	
+											except OSError:
+												print ('Error with: ' + fullPath)
+												pass
+										else:
+											try:
+												os.makedirs(labelFolder)
+											except OSError:
+												print ('Cannot recognize: ' + celebrity + ' with filename: ' + fileName)
+												celebrityPath = (celebrityFolder + '\\unsorted\\' + fileName)
+												shutil.move(fullPath,celebrityPath)	
 # AWS Image Rekognition by creating folders based on the label and moving the image there. This is the main function. 
 def rekognizeLabels():
 	for fileName in os.listdir(thumbnailFolder):
@@ -149,7 +152,17 @@ def fileCounter():
 	for root, dirs, files in os.walk(celebrityFolder):		
 		pictureCount = len(os.listdir(root)) 
 		#utf-8 allows for "Out-File" in PowerShell
-		print ((root + ',' + format(pictureCount)).encode('utf-8'))
+		print ((root + ',' + format(pictureCount)).encode('utf-8'))	
+	
+def theNeedful():
+	print('Creating folders...')
+	createFolders()
+	print('\n' + 'Downloading from Reddit...')
+	reddit()
+	print('\n' + 'Rekognizing...')
+	rekognizeCelebrities()
+	print('\n' + 'Done, here are the results:')
+	fileCounter()
 
 # Redundant so I can easily put my folders in. 
 def nullDirectories():
@@ -186,6 +199,7 @@ parser.add_argument('-label', '-lbl', action='store_true', help='Rekognize Pictu
 parser.add_argument('-createFolders','-cf', '-cF', action='store_true', help='Create Folders')
 parser.add_argument('-reddit','-r', action='store_true', help='Reddit Function')
 parser.add_argument('-fileCounter','-fC', '-fc', action='store_true', help='File Counter')
+parser.add_argument('-theNeedful', '-tn', action='store_true')
 
 args = parser.parse_args()
 
@@ -205,5 +219,7 @@ elif args.reddit:
 	reddit()
 elif args.fileCounter:
 	fileCounter()
+elif args.theNeedful:
+    theNeedful()
 else:
 	helloWorld()
